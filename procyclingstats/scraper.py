@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 import requests
 from selectolax.parser import HTMLParser
 
-# Intentar importar cloudscraper para bypasear Cloudflare
+# Try to import cloudscraper to bypass Cloudflare
 try:
     import cloudscraper
     HAS_CLOUDSCRAPER = True
@@ -18,7 +18,7 @@ class Scraper:
     """Base class for all scraping classes."""
     BASE_URL: str = "https://www.procyclingstats.com/"
     
-    # Headers para simular navegador real
+    # Headers to mimic a real browser and avoid being blocked by anti-scraping measures
     DEFAULT_HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -27,8 +27,8 @@ class Scraper:
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
     }
-    
-    # Sesión compartida para mantener cookies
+
+    # Shared session to maintain cookies
     _session = None
     _scraper = None  # cloudscraper instance
 
