@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+from selectolax.parser import HTMLParser
 
 from .scraper import Scraper
 
@@ -180,3 +181,31 @@ class TodayRaces(Scraper):
                 "category": category
             })
         return races
+
+    def race_urls_for_date(self, date: str = '') -> List[str]:
+        """
+        Get all race URLs for a specific date from the ProCyclingStats calendar page,
+        but only from within div.content > div.page-content.
+
+        :param date: Date in 'YYYY-MM-DD' format.
+        :return: List of race URLs (relative to the site root).
+        """
+        url = f"races.php?p=uci&s=today&date={date}&nation=&cat=&filter=Filter"
+        session = self._scraper if hasattr(self, '_scraper') and self._scraper else self._session
+        if session is None:
+            import requests
+            session = requests.Session()
+        resp = session.get(self.BASE_URL + url)
+        html = HTMLParser(resp.text)
+        race_urls = set()
+        content_div = html.css_first("div.content")
+        if content_div:
+            page_content_div = content_div.css_first("div.page-content")
+            if page_content_div:
+                for a in page_content_div.css("a"):
+                    href = a.attributes.get("href")
+                    if href and (href.startswith("/race/") or href.startswith("race/")):
+                        if href.startswith("/race/"):
+                            href = href[1:]
+                        race_urls.add(href)
+        return sorted(race_urls)

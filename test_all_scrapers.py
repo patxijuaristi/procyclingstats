@@ -28,7 +28,8 @@ from procyclingstats import (
     Rider,
     RiderResults,
     Stage,
-    Team
+    Team,
+    TodayRaces
 )
 
 
@@ -168,85 +169,121 @@ def main():
     
     results = []
     
-    # 1. Race Scraper
-    results.append(test_scraper(
-        Race,
-        "race/tour-de-france/2022",
-        "Race Scraper",
-    ))
+    # # 1. Race Scraper
+    # results.append(test_scraper(
+    #     Race,
+    #     "race/tour-de-france/2022",
+    #     "Race Scraper",
+    # ))
     
-    # 2. Race Climbs Scraper
-    results.append(test_scraper(
-        RaceClimbs,
-        "race/tour-de-france/2022/route/climbs",
-        "Race Climbs Scraper",
-    ))
+    # # 2. Race Climbs Scraper
+    # results.append(test_scraper(
+    #     RaceClimbs,
+    #     "race/tour-de-france/2022/route/climbs",
+    #     "Race Climbs Scraper",
+    # ))
     
-    # 3. Race Combative Riders Scraper
-    results.append(test_scraper(
-        RaceCombativeRiders,
-        "race/tour-de-france/2022/results/combative-riders",
-        "Race Combative Riders Scraper",
-    ))
+    # # 3. Race Combative Riders Scraper
+    # results.append(test_scraper(
+    #     RaceCombativeRiders,
+    #     "race/tour-de-france/2022/results/combative-riders",
+    #     "Race Combative Riders Scraper",
+    # ))
     
-    # 4. Race Startlist Scraper
-    results.append(test_scraper(
-        RaceStartlist,
-        "race/tour-de-france/2022/startlist",
-        "Race Startlist Scraper",
-    ))
+    # # 4. Race Startlist Scraper
+    # results.append(test_scraper(
+    #     RaceStartlist,
+    #     "race/tour-de-france/2022/startlist",
+    #     "Race Startlist Scraper",
+    # ))
     
-    # 5. Ranking Scraper
-    results.append(test_scraper(
-        Ranking,
-        "rankings/me/individual",
-        "Ranking Scraper (Individual)",
-        parse_methods=["individual_ranking"]
-    ))
+    # # 5. Ranking Scraper
+    # results.append(test_scraper(
+    #     Ranking,
+    #     "rankings/me/individual",
+    #     "Ranking Scraper (Individual)",
+    #     parse_methods=["individual_ranking"]
+    # ))
     
-    # 6. Ranking - Teams
-    results.append(test_scraper(
-        Ranking,
-        "rankings/me/teams",
-        "Ranking Scraper (Teams)",
-        parse_methods=["team_ranking"]
-    ))
+    # # 6. Ranking - Teams
+    # results.append(test_scraper(
+    #     Ranking,
+    #     "rankings/me/teams",
+    #     "Ranking Scraper (Teams)",
+    #     parse_methods=["team_ranking"]
+    # ))
     
-    # 7. Ranking - Nations
-    results.append(test_scraper(
-        Ranking,
-        "rankings/me/nations",
-        "Ranking Scraper (Nations)",
-        parse_methods=["nation_ranking"]
-    ))
+    # # 7. Ranking - Nations
+    # results.append(test_scraper(
+    #     Ranking,
+    #     "rankings/me/nations",
+    #     "Ranking Scraper (Nations)",
+    #     parse_methods=["nation_ranking"]
+    # ))
     
-    # 8. Rider Scraper
-    results.append(test_scraper(
-        Rider,
-        "rider/tadej-pogacar",
-        "Rider Scraper",
-    ))
+    # # 8. Rider Scraper
+    # results.append(test_scraper(
+    #     Rider,
+    #     "rider/tadej-pogacar",
+    #     "Rider Scraper",
+    # ))
     
-    # 9. Rider Results Scraper
-    results.append(test_scraper(
-        RiderResults,
-        "rider/tadej-pogacar/results",
-        "Rider Results Scraper",
-    ))
+    # # 9. Rider Results Scraper
+    # results.append(test_scraper(
+    #     RiderResults,
+    #     "rider/tadej-pogacar/results",
+    #     "Rider Results Scraper",
+    # ))
     
-    # 10. Stage Scraper
-    results.append(test_scraper(
-        Stage,
-        "race/tour-de-france/2022/stage-18",
-        "Stage Scraper",
-    ))
+    # # 10. Stage Scraper
+    # results.append(test_scraper(
+    #     Stage,
+    #     "race/tour-de-france/2022/stage-18",
+    #     "Stage Scraper",
+    # ))
     
-    # 11. Team Scraper
+    # # 11. Team Scraper
+    # results.append(test_scraper(
+    #     Team,
+    #     "team/uae-team-emirates-2024",
+    #     "Team Scraper",
+    # ))
+    
+    # 12. TodayRaces Scraper (default)
     results.append(test_scraper(
-        Team,
-        "team/uae-team-emirates-2024",
-        "Team Scraper",
+        TodayRaces,
+        "",  # No URL needed for homepage
+        "TodayRaces Scraper (today)",
+        parse_methods=["live_races", "finished_races", "yesterday_races"]
     ))
+
+    # 13. TodayRaces Scraper (with date)
+    print_header("Probando: TodayRaces Scraper (con fecha)")
+    test_date = "2026-02-06"
+    try:
+        today_scraper = TodayRaces()
+        urls = today_scraper.race_urls_for_date(test_date)
+        print_info(f"Races for {test_date}: {len(urls)} URLs")
+        for url in urls[:5]:
+            print_data("race_url", url)
+        results.append({
+            "name": f"TodayRaces Scraper (date={test_date})",
+            "url": f"races.php?p=uci&s=today&date={test_date}",
+            "success": True,
+            "error": None,
+            "data": urls,
+            "time": 0
+        })
+    except Exception as e:
+        print_error(f"Error: {e}")
+        results.append({
+            "name": f"TodayRaces Scraper (date={test_date})",
+            "url": f"races.php?p=uci&s=today&date={test_date}",
+            "success": False,
+            "error": str(e),
+            "data": None,
+            "time": 0
+        })
     
     # Resumen final
     print_header("RESUMEN DE RESULTADOS")
